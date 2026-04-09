@@ -11,7 +11,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-st.title("🚀 Analizador de Decisiones TOPSIS")
+st.title("Método TOPSIS")
 st.write("Configura el tamaño de tu matriz y llena los datos directamente en la tabla.")
 
 # --- INTERFAZ DE USUARIO ---
@@ -22,35 +22,35 @@ with col1:
 with col2:
     num_criterios = st.number_input("Número de Criterios (Columnas)", min_value=2, max_value=10, value=5)
 
-alternativas_nombres = [f"Opción {i+1}" for i in range(num_alternativas)]
+alternativas_nombres = [f"Alternativa {i+1}" for i in range(num_alternativas)]
 criterios_nombres = [f"Criterio {chr(65+i)}" for i in range(num_criterios)] # Nombra A, B, C, D...
 
 df_vacio = pd.DataFrame(0.0, index=alternativas_nombres, columns=criterios_nombres)
-df_vacio.insert(0, "Nombre de la Opción", alternativas_nombres)
+df_vacio.insert(0, "Nombre de cada Alternativa", alternativas_nombres)
 
-st.subheader("📝 Llena tu matriz de decisión")
-st.info("💡 Haz doble clic en cualquier celda para editar el nombre de la opción o su valor.")
+st.subheader("Llena la matriz de decisión con tus datos correspondientes")
+st.info("Haz doble clic en cualquier celda para editar los valores de cada alternativa dado su criterio y el nombre de tu alternativa.")
 
 # Tabla interactiva
 df_editado = st.data_editor(df_vacio, hide_index=True, use_container_width=True)
 
-st.sidebar.header("Configuración de Criterios")
+st.sidebar.header("Pesos de Criterios. Recuerda que la suma de los pesos 1")
 pesos = []
 impactos = []
 
 columnas_criterios = df_editado.columns[1:]
 
 for col in columnas_criterios:
-    st.sidebar.subheader(f"Criterio: {col}")
+    st.sidebar.subheader(f"{col}")
     w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, round(1.0/num_criterios, 2))
-    imp = st.sidebar.selectbox(f"Tipo de impacto ({col})", ["Beneficio (+)", "Costo (-)"])
+    imp = st.sidebar.selectbox(f"Tipo de impacto ({col})", ["Maximizar (+)", "Minimizar (-)"])
 
     pesos.append(w)
-    impactos.append(1 if "Beneficio" in imp else -1)
+    impactos.append(1 if "Maximizar" in imp else -1)
 
 # --- LÓGICA MATEMÁTICA TOPSIS ---
 
-if st.button("Calcular Ranking TOPSIS", type="primary"):
+if st.button("Calcular Ranking dado TOPSIS", type="primary"):
 
     # Validar pesos
     if sum(pesos) < 0.99 or sum(pesos) > 1.01:
@@ -100,9 +100,9 @@ if st.button("Calcular Ranking TOPSIS", type="primary"):
 
     # --- MOSTRAR RESULTADOS EN LA INTERFAZ ---
 
-    st.success("¡Cálculo completado exitosamente!")
+    st.success("Cálculo completado")
 
-    st.subheader("🏆 Ranking Final")
+    st.subheader("Ranking Final")
     st.dataframe(df_resultados, hide_index=True, use_container_width=True)
 
     # Opcional: Un gráfico de barras para que sea más visual
