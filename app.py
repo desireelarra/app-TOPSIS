@@ -29,7 +29,7 @@ df_vacio = pd.DataFrame(0.0, index=alternativas_nombres, columns=criterios_nombr
 df_vacio.insert(0, "Nombre de cada Alternativa", alternativas_nombres)
 
 st.subheader("Llena la matriz de decisión con tus datos correspondientes")
-st.info("Haz doble clic en cualquier celda para editar los valores de cada alternativa dado su criterio y el nombre de tu alternativa.")
+st.info("Haz doble clic en cualquier celda para editar los valores de cada alternativa dado su criterio y agrega nombre a tus alternativas.")
 
 # Tabla interactiva
 df_editado = st.data_editor(df_vacio, hide_index=True, use_container_width=True)
