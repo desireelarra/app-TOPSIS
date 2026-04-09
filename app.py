@@ -50,7 +50,7 @@ for col in columnas_criterios:
 
 # --- LÓGICA MATEMÁTICA TOPSIS ---
 
-if st.button("Calcular Ranking dado TOPSIS", type="primary"):
+if st.button("Calcular Ranking", type="primary"):
 
     # Validar pesos
     if sum(pesos) < 0.99 or sum(pesos) > 1.01:
