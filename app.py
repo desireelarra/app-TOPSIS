@@ -34,7 +34,7 @@ st.info("Haz doble clic en cualquier celda para editar los valores de cada alter
 # Tabla interactiva
 df_editado = st.data_editor(df_vacio, hide_index=True, use_container_width=True)
 
-st.sidebar.header("Pesos de Criterios. Recuerda que la suma de los pesos 1")
+st.sidebar.header("Pesos de Criterios (todos los pesos deben sumar 1)")
 pesos = []
 impactos = []
 
