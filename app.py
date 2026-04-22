@@ -127,7 +127,7 @@ if df_editado is not None:
         st.subheader("Lista de mejores opciones (ordenadas de mayor a menor)")
         st.dataframe(df_resultados, hide_index=True, use_container_width=True)
 
-        st.bar_chart(df_resultados.set_index("Opciones")["Cercanía (Desempeño)"])
+        st.bar_chart(df_resultados.set_index("Alternativa")["Cercanía (Desempeño)"])
 
         with st.expander("Ver detalles del cálculo (Matriz Ponderada, Distancias, etc.)"):
             st.write("**Matriz Normalizada Ponderada:**")
