@@ -70,7 +70,7 @@ if df_editado is not None:
         # Ajustamos el valor por defecto dependiendo de si es manual o archivo
         valor_defecto = round(1.0/num_criterios, 2) if metodo_entrada == "Entrada manual" else 0.5
         w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, valor_defecto, key=f"w_{col}")
-        imp = st.sidebar.selectbox(f"Tipo de impacto ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
+        imp = st.sidebar.selectbox(f"Necesito: ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
 
         pesos.append(w)
         impactos.append(1 if "Maximizar" in imp else -1)
