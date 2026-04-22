@@ -18,14 +18,14 @@ st.title("Método TOPSIS")
 # --- SELECTOR DE MÉTODO DE ENTRADA ---
 metodo_entrada = st.radio(
     "¿Cómo prefieres ingresar los datos de tu tabla?",
-    ["Agregar manualmente los datos de mi tabla (menor a 6 filas o columnas)", "Subir archivo Excel (.xlsx) de mi tabla"],
+    ["Agregar manualmente los datos de mi tabla (máximo a 8 filas o columnas)", "Subir archivo Excel (.xlsx) de mi tabla"],
     horizontal=True
 )
 
 df_editado = None
 
 # --- OPCIÓN 1: ENTRADA MANUAL ---
-if metodo_entrada == "Agregar manualmente los datos de mi tabla (maximo 8 filas o columnas)": #Poner la matriz de manera manual.
+if metodo_entrada == "Agregar manualmente los datos de mi tabla (máximo 8 filas o columnas)": #Poner la matriz de manera manual.
     st.write("Configura el tamaño de tu tabla dadas tus opciones y criterios, para después llenar los datos directamente en la tabla de abajo.")
     col1, col2 = st.columns(2)
     with col1:
