@@ -116,7 +116,7 @@ if df_editado is not None:
         df_resultados = pd.DataFrame({
             "Alternativa": alternativas,
             "Cercanía (Desempeño)": cercania
-        }).sort_values(by="Cercanía (desempeño) a la mejor opción", ascending=False)
+        }).sort_values(by="Cercanía (Desempeño)", ascending=False)
 
         df_resultados["Ranking"] = range(1, len(df_resultados) + 1)
         df_resultados = df_resultados[["Ranking", "Alternativa", "Cercanía (Desempeño)"]]
