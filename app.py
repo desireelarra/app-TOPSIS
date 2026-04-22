@@ -14,7 +14,6 @@ import numpy as np
 
 st.set_page_config(page_title="Método TOPSIS", layout="wide")
 st.title("Método TOPSIS")
-st.write("Configura el tamaño de tu tabla dadas tus opciones y criterios, para después llenar los datos directamente en la tabla de abajo.")
 
 # --- SELECTOR DE MÉTODO DE ENTRADA ---
 metodo_entrada = st.radio(
@@ -28,6 +27,7 @@ df_editado = None
 # --- OPCIÓN 1: ENTRADA MANUAL ---
 if metodo_entrada == "Agregar manualmente los datos de mi tabla (menor a 6 filas o columnas)": #Poner la matriz de manera manual.
     col1, col2 = st.columns(2)
+    st.write("Configura el tamaño de tu tabla dadas tus opciones y criterios, para después llenar los datos directamente en la tabla de abajo.")
     with col1:
         num_alternativas = st.number_input("Número de Opciones (Filas)", min_value=2, max_value=20, value=4)
     with col2:
