@@ -18,7 +18,7 @@ st.title("Método TOPSIS")
 # --- SELECTOR DE MÉTODO DE ENTRADA ---
 metodo_entrada = st.radio(
     "¿Cómo prefieres ingresar los datos de tu tabla?",
-    ["Agregar manualmente los datos de mi tabla (máximo a 8 filas o columnas)", "Subir archivo Excel (.xlsx) de mi tabla"],
+    ["Agregar manualmente los datos de mi tabla (máximo 8 filas o columnas)", "Subir archivo Excel (.xlsx) de mi tabla"],
     horizontal=True
 )
 
