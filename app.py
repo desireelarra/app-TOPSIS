@@ -59,7 +59,9 @@ else:
 
 # --- CONFIGURACIÓN DE CRITERIOS ---
 if df_editado is not None:
-    st.sidebar.header("Pesos sobre cada Criterios (todos los pesos deben sumar 1)")
+    st.sidebar.header("Pesos sobre cada Criterio")
+    st.sidebar.write("Ajusta los sliders. La suma total debe ser exactamente 1.00")
+    
     pesos = []
     impactos = []
 
@@ -67,13 +69,27 @@ if df_editado is not None:
 
     for col in columnas_criterios:
         st.sidebar.subheader(f"{col}")
-        # Ajustamos el valor por defecto dependiendo de si es manual o archivo
-        valor_defecto = round(1.0/num_criterios, 2) if "manualmente" in metodo_entrada else 0.5
-        w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, valor_defecto, key=f"w_{col}")
+        # CAMBIO 1: Quitamos el cálculo condicional y forzamos a que empiece en 0.0
+        w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, 0.0, key=f"w_{col}")
         imp = st.sidebar.selectbox(f"Necesito: ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
 
         pesos.append(w)
         impactos.append(1 if "Maximizar" in imp else -1)
+
+    # CAMBIO 2: El contador en tiempo real (aparecerá debajo del último slider)
+    suma_actual = sum(pesos)
+    
+    st.sidebar.divider() # Dibuja una línea de separación elegante
+    
+    # Lógica de colores y mensajes para el usuario
+    if round(suma_actual, 2) == 1.00:
+        st.sidebar.success(f"✅ Suma perfecta: {suma_actual:.2f} / 1.00")
+    elif suma_actual > 1.00:
+        st.sidebar.error(f"❌ Te pasaste: {suma_actual:.2f} / 1.00")
+    else:
+        st.sidebar.warning(f"⏳ Suma actual: {suma_actual:.2f} (Faltan {1.0 - suma_actual:.2f})")
+    
+    st.sidebar.divider()
 
     # --- LÓGICA MATEMÁTICA TOPSIS ---
     if st.button("Obtener la mejor opción", type="primary"):
@@ -115,11 +131,11 @@ if df_editado is not None:
         # Paso 7: Ranking final
         df_resultados = pd.DataFrame({
             "Alternativa": alternativas,
-            "Ranking (cercanía)": cercania
-        }).sort_values(by="Ranking (cercanía)", ascending=False)
+            "Ranking (más cercano a la ideal)": cercania
+        }).sort_values(by="Ranking (más cercano a la ideal)", ascending=False)
 
         df_resultados["Ranking"] = range(1, len(df_resultados) + 1)
-        df_resultados = df_resultados[["Ranking", "Alternativa", "Ranking (cercanía)"]]
+        df_resultados = df_resultados[["Ranking", "Alternativa", "Ranking (más cercano a la ideal)"]]
 
         # --- MOSTRAR RESULTADOS EN LA INTERFAZ ---
         st.success("Cálculo completado")
@@ -127,7 +143,7 @@ if df_editado is not None:
         st.subheader("Lista de mejores opciones (ordenadas de mayor a menor)")
         st.dataframe(df_resultados, hide_index=True, use_container_width=True)
 
-        st.bar_chart(df_resultados.set_index("Alternativa")["Ranking (cercanía)"])
+        st.bar_chart(df_resultados.set_index("Alternativa")["Ranking (más cercano a la ideal)"])
 
         with st.expander("Ver detalles del cálculo (Matriz Ponderada, Distancias, etc.)"):
             st.write("**Matriz Normalizada Ponderada:**")
