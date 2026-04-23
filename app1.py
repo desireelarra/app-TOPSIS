@@ -57,15 +57,22 @@ else:
         st.info(f"Matriz de decisión cargada desde la hoja: '{excel_obj.sheet_names[0]}'")
         df_editado = st.data_editor(df_subido, hide_index=True, use_container_width=True)
         
-        # PESOS (Segunda hoja - Ahora solo busca una columna)
+        # PESOS (Segunda hoja - Validación Avanzada)
         if len(excel_obj.sheet_names) > 1:
             try:
-                df_conf = pd.read_excel(uploaded_file, sheet_name=1)
-                # Solo tomamos la primera columna como los pesos
-                pesos_auto = df_conf.iloc[:, 0].tolist()
-                st.success(f"✅ Pesos detectados en la hoja: '{excel_obj.sheet_names[1]}'. Por favor, define qué necesitas maximizar o minimizar en el menú lateral.")
+                # header=None evita que se pierda el primer peso si no le ponen título
+                df_conf = pd.read_excel(uploaded_file, sheet_name=1, header=None)
+                
+                # Forzamos a que sean números y eliminamos celdas vacías o con texto
+                pesos_brutos = pd.to_numeric(df_conf.iloc[:, 0], errors='coerce').dropna().tolist()
+                
+                if len(pesos_brutos) > 0:
+                    pesos_auto = pesos_brutos
+                    st.success(f"✅ Pesos detectados en la hoja: '{excel_obj.sheet_names[1]}'. Por favor, define qué necesitas maximizar o minimizar en el menú lateral.")
+                else:
+                    st.warning("⚠️ Se detectó una segunda hoja, pero está vacía o no tiene números. **Por favor cree la lista de pesos en orden para que se carguen automáticamente.**")
             except Exception as e:
-                st.error("Se detectó una segunda hoja pero hubo un error al leer los pesos.")
+                st.warning("⚠️ Hubo un error al leer la segunda hoja. **Por favor cree la lista de pesos en orden para que se carguen automáticamente.**")
     else:
         st.warning("Esperando archivo... , sube un archivo Excel para continuar.")
         st.stop()
@@ -80,25 +87,23 @@ if df_editado is not None:
     espacio_nota = st.sidebar.empty() 
     st.sidebar.divider()
 
-    # Recorremos cada criterio para poner sus controles
     for i, col in enumerate(columnas_criterios):
         st.sidebar.subheader(f"{col}")
         
-        # 1. EL PESO (Automático del Excel o Manual con Slider)
+        # 1. EL PESO
         if pesos_auto is None:
             w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, 0.0, key=f"w_{col}")
         else:
-            # Extraemos el peso del Excel asegurándonos de que exista
             w = pesos_auto[i] if i < len(pesos_auto) else 0.0
             st.sidebar.info(f"**Peso asignado:** {w}")
             
-        # 2. EL IMPACTO (Siempre manual a prueba de errores)
+        # 2. EL IMPACTO
         imp = st.sidebar.selectbox(f"Necesito: ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
         
         pesos.append(w)
         impactos.append(1 if "Maximizar" in imp else -1)
 
-    # Lógica del contador visual en la barra lateral
+    # Lógica del contador visual
     suma_actual = sum(pesos)
     if round(suma_actual, 2) == 1.00:
         espacio_nota.success(f"Perfecto, has llegado a: {suma_actual:.2f} / 1.00")
