@@ -86,11 +86,11 @@ if df_editado is not None:
     
     # 3. Llenamos el "espacio reservado" de arriba con el resultado
     if round(suma_actual, 2) == 1.00:
-        espacio_nota.success(f"✅ Suma perfecta: {suma_actual:.2f} / 1.00")
+        espacio_nota.success(f"Perfecto, haz llegado a: {suma_actual:.2f} / 1.00")
     elif suma_actual > 1.00:
-        espacio_nota.error(f"❌ Te pasaste: {suma_actual:.2f} / 1.00")
+        espacio_nota.error(f"Haz rebasado 1: {suma_actual:.2f} / 1.00")
     else:
-        espacio_nota.warning(f"⏳ Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f} para llegar a 1.00)")
+        espacio_nota.warning(f"Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f} para llegar a 1.00)")
     
     st.sidebar.divider()
 
