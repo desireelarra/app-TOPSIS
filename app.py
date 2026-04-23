@@ -62,6 +62,11 @@ if df_editado is not None:
     st.sidebar.header("Pesos sobre cada Criterio")
     st.sidebar.write("Ajusta los sliders. La suma total debe ser exactamente 1.00")
     
+    # 1. Creamos un "espacio reservado" vacío en la parte de arriba
+    espacio_nota = st.sidebar.empty() 
+    
+    st.sidebar.divider() # Línea separadora
+    
     pesos = []
     impactos = []
 
@@ -69,27 +74,28 @@ if df_editado is not None:
 
     for col in columnas_criterios:
         st.sidebar.subheader(f"{col}")
-        # CAMBIO 1: Quitamos el cálculo condicional y forzamos a que empiece en 0.0
+        # Los sliders empiezan en 0.0
         w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, 0.0, key=f"w_{col}")
         imp = st.sidebar.selectbox(f"Necesito: ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
 
         pesos.append(w)
         impactos.append(1 if "Maximizar" in imp else -1)
 
-    # CAMBIO 2: El contador en tiempo real (aparecerá debajo del último slider)
+    # 2. Calculamos la suma
     suma_actual = sum(pesos)
     
-    st.sidebar.divider() # Dibuja una línea de separación elegante
-    
-    # Lógica de colores y mensajes para el usuario
+    # 3. Llenamos el "espacio reservado" de arriba con el resultado
     if round(suma_actual, 2) == 1.00:
-        st.sidebar.success(f"✅ Suma perfecta: {suma_actual:.2f} / 1.00")
+        espacio_nota.success(f"✅ Suma perfecta: {suma_actual:.2f} / 1.00")
     elif suma_actual > 1.00:
-        st.sidebar.error(f"❌ Te pasaste: {suma_actual:.2f} / 1.00")
+        espacio_nota.error(f"❌ Te pasaste: {suma_actual:.2f} / 1.00")
     else:
-        st.sidebar.warning(f"⏳ Suma actual: {suma_actual:.2f} (Faltan {1.0 - suma_actual:.2f})")
+        espacio_nota.warning(f"⏳ Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f} para llegar a 1.00)")
     
     st.sidebar.divider()
+
+    # --- LÓGICA MATEMÁTICA TOPSIS ---
+    # (A partir de aquí dejas tu código normal del botón...)
 
     # --- LÓGICA MATEMÁTICA TOPSIS ---
     if st.button("Obtener la mejor opción", type="primary"):
