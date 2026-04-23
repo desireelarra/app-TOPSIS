@@ -68,7 +68,7 @@ if df_editado is not None:
     for col in columnas_criterios:
         st.sidebar.subheader(f"{col}")
         # Ajustamos el valor por defecto dependiendo de si es manual o archivo
-        valor_defecto = round(1.0/num_criterios, 2) if metodo_entrada == "Entrada manual" else 0.5
+        valor_defecto = round(1.0/num_criterios, 2) if "manualmente" in metodo_entrada else 0.5
         w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, valor_defecto, key=f"w_{col}")
         imp = st.sidebar.selectbox(f"Necesito: ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
 
@@ -116,7 +116,7 @@ if df_editado is not None:
         df_resultados = pd.DataFrame({
             "Alternativa": alternativas,
             "Ranking (cercanía)": cercania
-        }).sort_values(by="Cercanía (Desempeño)", ascending=False)
+        }).sort_values(by="Ranking (cercanía)", ascending=False)
 
         df_resultados["Ranking"] = range(1, len(df_resultados) + 1)
         df_resultados = df_resultados[["Ranking", "Alternativa", "Ranking (cercanía)"]]
