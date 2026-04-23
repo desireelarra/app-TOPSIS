@@ -25,10 +25,9 @@ metodo_entrada = st.radio(
 # Inicializamos variables clave
 df_editado = None
 pesos_auto = None
-impactos_auto = None
 
 # --- OPCIÓN 1: ENTRADA MANUAL ---
-if "manualmente" in metodo_entrada:
+if "manualmente" in metodo_entrada: 
     st.write("Configura el tamaño de tu tabla dadas tus opciones y criterios...")
     col1, col2 = st.columns(2)
     with col1:
@@ -41,79 +40,77 @@ if "manualmente" in metodo_entrada:
 
     df_vacio = pd.DataFrame(0.0, index=alternativas_nombres, columns=criterios_nombres)
     df_vacio.insert(0, "Nombre de cada Opción", alternativas_nombres)
-
+    
     st.subheader("Llena la siguiente tabla con tus datos correspondientes")
     df_editado = st.data_editor(df_vacio, hide_index=True, use_container_width=True)
 
-# --- OPCIÓN 2: SUBIR ARCHIVO (Aquí está el cambio principal) ---
+# --- OPCIÓN 2: SUBIR ARCHIVO ---
 else:
     st.subheader("Sube tu archivo")
     uploaded_file = st.file_uploader("Selecciona un archivo .xlsx", type=["xlsx"])
 
     if uploaded_file:
-        # Usamos ExcelFile para ver cuántas hojas hay
         excel_obj = pd.ExcelFile(uploaded_file)
-
-        # Siempre tomamos la PRIMERA HOJA (índice 0) como la Matriz
+        
+        # MATRIZ (Primera hoja)
         df_subido = pd.read_excel(uploaded_file, sheet_name=0)
         st.info(f"Matriz de decisión cargada desde la hoja: '{excel_obj.sheet_names[0]}'")
         df_editado = st.data_editor(df_subido, hide_index=True, use_container_width=True)
-
-        # Si hay una SEGUNDA HOJA (índice 1), intentamos cargar Pesos e Impactos
+        
+        # PESOS (Segunda hoja - Ahora solo busca una columna)
         if len(excel_obj.sheet_names) > 1:
             try:
                 df_conf = pd.read_excel(uploaded_file, sheet_name=1)
-                # Asumimos: Columna 1 = Pesos, Columna 2 = Maximizar/Minimizar
+                # Solo tomamos la primera columna como los pesos
                 pesos_auto = df_conf.iloc[:, 0].tolist()
-                impactos_auto = [1 if "max" in str(x).lower() else -1 for x in df_conf.iloc[:, 1]]
-                st.success(f"✅ Configuración detectada en la hoja: '{excel_obj.sheet_names[1]}'")
+                st.success(f"✅ Pesos detectados en la hoja: '{excel_obj.sheet_names[1]}'. Por favor, define qué necesitas maximizar o minimizar en el menú lateral.")
             except Exception as e:
-                st.error("Se detectó una segunda hoja pero el formato no es correcto (debe tener Pesos e Impactos).")
+                st.error("Se detectó una segunda hoja pero hubo un error al leer los pesos.")
     else:
         st.warning("Esperando archivo... , sube un archivo Excel para continuar.")
         st.stop()
 
-# --- CONFIGURACIÓN DE CRITERIOS (BARRA LATERAL) ---
+# --- CONFIGURACIÓN DE CRITERIOS (BARRA LATERAL HÍBRIDA) ---
 if df_editado is not None:
     pesos = []
     impactos = []
     columnas_criterios = df_editado.columns[1:]
-    num_criterios_reales = len(columnas_criterios)
+    
+    st.sidebar.header("Pesos sobre cada Criterio")
+    espacio_nota = st.sidebar.empty() 
+    st.sidebar.divider()
 
-    # Si NO se cargaron pesos del Excel, mostramos los sliders interactivos
-    if pesos_auto is None:
-        st.sidebar.header("Pesos sobre cada Criterio")
-        espacio_nota = st.sidebar.empty()
-        st.sidebar.divider()
-
-        for col in columnas_criterios:
-            st.sidebar.subheader(f"{col}")
-            # El valor por defecto es 0.0 o distribuido si es manual
+    # Recorremos cada criterio para poner sus controles
+    for i, col in enumerate(columnas_criterios):
+        st.sidebar.subheader(f"{col}")
+        
+        # 1. EL PESO (Automático del Excel o Manual con Slider)
+        if pesos_auto is None:
             w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, 0.0, key=f"w_{col}")
-            imp = st.sidebar.selectbox(f"Necesito: ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
-            pesos.append(w)
-            impactos.append(1 if "Maximizar" in imp else -1)
-
-        suma_actual = sum(pesos)
-        if round(suma_actual, 2) == 1.00:
-            espacio_nota.success(f"Perfecto, haz llegado a: {suma_actual:.2f} / 1.00")
-        elif suma_actual > 1.00:
-            espacio_nota.error(f"Haz rebasado 1: {suma_actual:.2f} / 1.00")
         else:
-            espacio_nota.warning(f"Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f})")
+            # Extraemos el peso del Excel asegurándonos de que exista
+            w = pesos_auto[i] if i < len(pesos_auto) else 0.0
+            st.sidebar.info(f"**Peso asignado:** {w}")
+            
+        # 2. EL IMPACTO (Siempre manual a prueba de errores)
+        imp = st.sidebar.selectbox(f"Necesito: ({col})", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
+        
+        pesos.append(w)
+        impactos.append(1 if "Maximizar" in imp else -1)
 
-    # Si YA se cargaron los pesos, los usamos directamente
+    # Lógica del contador visual en la barra lateral
+    suma_actual = sum(pesos)
+    if round(suma_actual, 2) == 1.00:
+        espacio_nota.success(f"Perfecto, has llegado a: {suma_actual:.2f} / 1.00")
+    elif suma_actual > 1.00:
+        espacio_nota.error(f"Has rebasado 1: {suma_actual:.2f} / 1.00")
     else:
-        pesos = pesos_auto
-        impactos = impactos_auto
-        st.sidebar.success("Utilizando configuración automática del archivo Excel.")
-        st.sidebar.write("**Pesos cargados:**", pesos)
-
+        espacio_nota.warning(f"Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f})")
+    
     st.sidebar.divider()
 
     # --- LÓGICA MATEMÁTICA TOPSIS ---
     if st.button("Obtener la mejor opción", type="primary"):
-        # Validar que sumen 1 (con un margen de error pequeño)
         if sum(pesos) < 0.98 or sum(pesos) > 1.02:
              st.error(f"La suma de los pesos es {sum(pesos):.2f}. Debe ser 1.0 para calcular.")
              st.stop()
@@ -121,7 +118,6 @@ if df_editado is not None:
         alternativas = df_editado.iloc[:, 0].tolist()
         matriz = df_editado.iloc[:, 1:].to_numpy(dtype=float)
 
-        # Cálculo de TOPSIS
         normas = np.linalg.norm(matriz, axis=0)
         normas = np.where(normas == 0, 1e-10, normas)
         matriz_ponderada = (matriz / normas) * np.array(pesos)
@@ -134,7 +130,6 @@ if df_editado is not None:
         distancia_neg = np.linalg.norm(matriz_ponderada - ideal_neg, axis=1)
         cercania = distancia_neg / (distancia_pos + distancia_neg)
 
-        # Resultados
         df_resultados = pd.DataFrame({
             "Alternativa": alternativas,
             "Ranking (más cercano a la ideal)": cercania
@@ -148,6 +143,14 @@ if df_editado is not None:
         st.dataframe(df_resultados, hide_index=True, use_container_width=True)
         st.bar_chart(df_resultados.set_index("Alternativa")["Ranking (más cercano a la ideal)"])
 
-        with st.expander("Ver detalles del cálculo"):
+        with st.expander("Ver detalles del cálculo (Matriz Ponderada, Distancias, etc.)"):
             st.write("**Matriz Normalizada Ponderada:**")
             st.dataframe(pd.DataFrame(matriz_ponderada, index=alternativas, columns=columnas_criterios))
+
+            st.write("**Distancias Ideales:**")
+            df_distancias = pd.DataFrame({
+                "Alternativa": alternativas,
+                "S_i* (Ideal)": distancia_pos,
+                "S_i- (Anti-ideal)": distancia_neg
+            })
+            st.dataframe(df_distancias, hide_index=True)
