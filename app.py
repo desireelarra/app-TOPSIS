@@ -115,11 +115,11 @@ if df_editado is not None:
         # Paso 7: Ranking final
         df_resultados = pd.DataFrame({
             "Alternativa": alternativas,
-            "Cercanía (Desempeño)": cercania
+            "Ranking (cercanía)": cercania
         }).sort_values(by="Cercanía (Desempeño)", ascending=False)
 
         df_resultados["Ranking"] = range(1, len(df_resultados) + 1)
-        df_resultados = df_resultados[["Ranking", "Alternativa", "Cercanía (Desempeño)"]]
+        df_resultados = df_resultados[["Ranking", "Alternativa", "Ranking (cercanía)"]]
 
         # --- MOSTRAR RESULTADOS EN LA INTERFAZ ---
         st.success("Cálculo completado")
@@ -127,7 +127,7 @@ if df_editado is not None:
         st.subheader("Lista de mejores opciones (ordenadas de mayor a menor)")
         st.dataframe(df_resultados, hide_index=True, use_container_width=True)
 
-        st.bar_chart(df_resultados.set_index("Alternativa")["Cercanía (Desempeño)"])
+        st.bar_chart(df_resultados.set_index("Alternativa")["Ranking (cercanía)"])
 
         with st.expander("Ver detalles del cálculo (Matriz Ponderada, Distancias, etc.)"):
             st.write("**Matriz Normalizada Ponderada:**")
