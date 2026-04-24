@@ -14,7 +14,7 @@ import numpy as np
 
 st.set_page_config(page_title="Método TOPSIS", layout="wide")
 st.title("Método TOPSIS")
-st.text("Es una técnica creada en 1981 por Hwang y Yoon. TOPSIS consiste en evaluar las alternativas dada su similitud y cercania a la mejor solución encontrrada en tus datos, y con ello dar una preferencia de mayor a menor (llamada ranking) de tus alternativas. Para este proceso, es necesario que nos proporciones tus Opciones / Alternativas entre las que estas decidiendo y tus Propiedades sobre las cuales a evualremos tus alternativas (estas propiedades serán llamadas Criterios de evaluación)")
+st.text("Es una técnica creada en 1981 por Hwang y Yoon. TOPSIS consiste en evaluar las alternativas dada su similitud y cercanía a la mejor solución encontrada en tus datos, y con ello dar una preferencia de mayor a menor (llamada ranking) de tus alternativas. Para este proceso, es necesario que nos proporciones tus Opciones / Alternativas entre las que estás decidiendo y tus Propiedades sobre las cuales evaluaremos tus alternativas (estas propiedades serán llamadas Criterios de evaluación).")
 
 # --- SELECTOR DE MÉTODO DE ENTRADA ---
 metodo_entrada = st.radio(
@@ -29,7 +29,7 @@ pesos_auto = None
 impactos_auto = None
 
 # --- OPCIÓN 1: ENTRADA MANUAL ---
-if "manualmente" in metodo_entrada:
+if "manualmente" in metodo_entrada: 
     st.write("Configura el tamaño de tu tabla dadas tus opciones y criterios de evaluación...")
     col1, col2 = st.columns(2)
     with col1:
@@ -42,46 +42,46 @@ if "manualmente" in metodo_entrada:
 
     df_vacio = pd.DataFrame(0.0, index=alternativas_nombres, columns=criterios_nombres)
     df_vacio.insert(0, "Nombre de cada Opción", alternativas_nombres)
-
+    
     st.subheader("Llena la siguiente tabla con tus datos correspondientes")
-    st.info("Esta tabla recibe el nombre de: Matriz de decisión. Haz doble clic en cualquier celda para editar el valor que le designas a cada opción dado su criterio de evaluación. No olvides agrega nombre a tus opciones.")
+    st.info("Esta tabla recibe el nombre de: Matriz de decisión. Haz doble clic en cualquier celda para editar el valor que le designas a cada opción dado su criterio de evaluación. No olvides agregar nombre a tus opciones.")
 
     df_editado = st.data_editor(df_vacio, hide_index=True, use_container_width=True)
 
 # --- OPCIÓN 2: SUBIR ARCHIVO ---
 else:
-    st.subheader("Sube tu archivo. No olviides poner nombres")
-    st.info("Si deseas que se agreguen automaticamente los Pesos o Valores de importancia de tus Criterios de evaluación, debes agregar una segunda hoja a tu archivo Excel, en ella debes colocar de arriba a abajo (es decir, unicamente en la columna A) el peso de tus criterios. El primer peso que agregues será considerando el peso del criterio de evaluación 1, el segundo peso que agregues será considerado el peso del criterio de evaluación 2 y así sucesivamente. Cualquier duda contartar a: " )
-    st.info("Si deseas agregar tus Pesos manualmente sube tu archivo Excel con unicamente una Hoja que incluyta tu tabla de decisión. En la siguiente pestaña podras agregar tus Pesos o Valores de importancia por criterio")
+    st.subheader("Sube tu archivo. No olvides poner nombres")
+    # Nota: Aquí puedes completar el correo electrónico o dato de contacto al final del texto
+    st.info("Si deseas que se agreguen automáticamente los Pesos o Valores de importancia de tus Criterios de evaluación, debes agregar una segunda hoja a tu archivo Excel, en ella debes colocar de arriba a abajo (es decir, únicamente en la columna A) el peso de tus criterios. El primer peso que agregues será considerado el peso del criterio de evaluación 1, el segundo peso que agregues será considerado el peso del criterio de evaluación 2 y así sucesivamente. Cualquier duda contactar a: [TU CORREO AQUÍ]")
+    st.info("Si deseas agregar tus Pesos manualmente sube tu archivo Excel con únicamente una Hoja que incluya tu tabla de decisión. En el menú lateral podrás agregar tus Pesos o Valores de importancia por criterio.")
     uploaded_file = st.file_uploader("Selecciona un archivo .xlsx", type=["xlsx"])
-
 
     if uploaded_file:
         excel_obj = pd.ExcelFile(uploaded_file)
-
+        
         # MATRIZ (Primera hoja)
         df_subido = pd.read_excel(uploaded_file, sheet_name=0)
         st.info(f"Tabla con datos de decisión cargada desde la hoja: '{excel_obj.sheet_names[0]}'")
         df_editado = st.data_editor(df_subido, hide_index=True, use_container_width=True)
-
+        
         # PESOS (Segunda hoja - Validación Avanzada)
         if len(excel_obj.sheet_names) > 1:
             try:
                 # header=None evita que se pierda el primer peso si no le ponen título
                 df_conf = pd.read_excel(uploaded_file, sheet_name=1, header=None)
-
+                
                 # Forzamos a que sean números y eliminamos celdas vacías o con texto
                 pesos_brutos = pd.to_numeric(df_conf.iloc[:, 0], errors='coerce').dropna().tolist()
-
+                
                 if len(pesos_brutos) > 0:
                     pesos_auto = pesos_brutos
-                    st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define en cada criterios si deseas maximizar o minimizar.")
+                    st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define en cada criterio si deseas maximizar o minimizar.")
                 else:
                     st.warning("Se detectó una segunda hoja, pero está vacía o no tiene números. **Por favor cree la lista de pesos en orden sobre la columna A para que se carguen automáticamente.**")
             except Exception as e:
-                st.warning("No se detecto una segunda hoja o hubo un error al leerla. **Por favor cree la segunda Hoja y haga una lista de pesos en orden sobre la columna A para que se carguen automáticamente. En caso contario, agregue manualmente el peso de cada criterio.**")
-    else:
-        st.warning("Esperando archivo... , sube un archivo Excel para continuar.")
+                st.warning("No se detectó una segunda hoja o hubo un error al leerla. **Por favor cree la segunda Hoja y haga una lista de pesos en orden sobre la columna A para que se carguen automáticamente. De lo contrario, agregue manualmente el peso de cada criterio.**")
+    else: 
+        st.warning("Esperando archivo... sube un archivo Excel para continuar.")
         st.stop()
 
 # --- CONFIGURACIÓN DE CRITERIOS (BARRA LATERAL HÍBRIDA) ---
@@ -89,24 +89,24 @@ if df_editado is not None:
     pesos = []
     impactos = []
     columnas_criterios = df_editado.columns[1:]
-
+    
     st.sidebar.header("Pesos o Valor de importancia sobre cada Criterio de evaluación")
-    espacio_nota = st.sidebar.empty()
+    espacio_nota = st.sidebar.empty() 
     st.sidebar.divider()
 
     for i, col in enumerate(columnas_criterios):
         st.sidebar.subheader(f"{col}")
-
+        
         # 1. EL PESO
         if pesos_auto is None:
             w = st.sidebar.slider(f"Peso para {col}", 0.0, 1.0, 0.0, key=f"w_{col}")
         else:
             w = pesos_auto[i] if i < len(pesos_auto) else 0.0
             st.sidebar.info(f"**Peso asignado:** {w}")
-
+            
         # 2. EL IMPACTO
         imp = st.sidebar.selectbox(f"Necesito:", ["Maximizar (+)", "Minimizar (-)"], key=f"imp_{col}")
-
+        
         pesos.append(w)
         impactos.append(1 if "Maximizar" in imp else -1)
 
@@ -118,11 +118,11 @@ if df_editado is not None:
         espacio_nota.error(f"Has rebasado 1: {suma_actual:.2f} / 1.00")
     else:
         espacio_nota.warning(f"Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f})")
-
+    
     st.sidebar.divider()
 
     # --- LÓGICA MATEMÁTICA TOPSIS ---
-    if st.button("Obtener el ranking dela mejor opción", type="primary"):
+    if st.button("Obtener el ranking de la mejor opción", type="primary"):
         if sum(pesos) < 0.98 or sum(pesos) > 1.02:
              st.error(f"La suma de los pesos es {sum(pesos):.2f}. Debe ser 1.0 para calcular.")
              st.stop()
@@ -144,16 +144,16 @@ if df_editado is not None:
 
         df_resultados = pd.DataFrame({
             "Alternativa": alternativas,
-            "Que tan cerca esta a la solución ideal": cercania
-        }).sort_values(by="Que tan cerca esta a la solución ideal", ascending=False)
+            "Qué tan cerca está de la solución ideal": cercania
+        }).sort_values(by="Qué tan cerca está de la solución ideal", ascending=False)
 
         df_resultados["Ranking"] = range(1, len(df_resultados) + 1)
-        df_resultados = df_resultados[["Ranking", "Alternativa", "Que tan cerca esta a la solución ideal"]]
+        df_resultados = df_resultados[["Ranking", "Alternativa", "Qué tan cerca está de la solución ideal"]]
 
         st.success("Cálculo completado")
         st.subheader("Lista de mejores opciones (ordenadas de mayor a menor)")
         st.dataframe(df_resultados, hide_index=True, use_container_width=True)
-        st.bar_chart(df_resultados.set_index("Alternativa")["Que tan cerca esta a la solución ideal"])
+        st.bar_chart(df_resultados.set_index("Alternativa")["Qué tan cerca está de la solución ideal"])
 
         with st.expander("Ver detalles del cálculo (Matriz Ponderada, Distancias, etc.)"):
             st.write("**Matriz Normalizada Ponderada:**")
