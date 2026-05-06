@@ -91,6 +91,7 @@ if df_editado is not None:
     columnas_criterios = df_editado.columns[1:]
     
     st.sidebar.header("Pesos o Valor de importancia sobre cada Criterio de evaluación")
+    st.info("La suma de todos tus pesos debe ser exactamente 1")
     espacio_nota = st.sidebar.empty() 
     st.sidebar.divider()
 
