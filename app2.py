@@ -14,7 +14,7 @@ import numpy as np
 
 st.set_page_config(page_title="Método TOPSIS", layout="wide")
 st.title("Método TOPSIS")
-st.text("Es una técnica creada en 1981 por Hwang y Yoon. TOPSIS consiste en evaluar las alternativas dada su similitud y cercanía a la mejor solución encontrada en tus datos, y con ello dar una preferencia de mayor a menor (llamada ranking) de tus alternativas. Para este proceso, es necesario que nos proporciones tus Opciones / Alternativas entre las que estás decidiendo y tus Propiedades sobre las cuales evaluaremos tus alternativas (estas propiedades serán llamadas Criterios de evaluación).")
+st.text("El método TOPSIS una técnica creada en 1981 por Hwang y Yoon. Este método consiste en evaluar las alternativas dada su similitud y cercanía a la mejor solución encontrada en tus datos, y con ello dar una lista de preferencia base tus opciones ordenadas de mayor a menor (llamada ranking). Para este proceso, es necesario que nos proporciones tus Opciones / Alternativas entre las que estás decidiendo y tus Propiedades sobre las cuales evaluaremos tus alternativas (estas propiedades serán llamadas Criterios de evaluación).")
 
 # --- SELECTOR DE MÉTODO DE ENTRADA ---
 metodo_entrada = st.radio(
@@ -30,7 +30,7 @@ impactos_auto = None
 
 # --- OPCIÓN 1: ENTRADA MANUAL ---
 if "manualmente" in metodo_entrada: 
-    st.write("Configura el tamaño de tu tabla dadas tus opciones y criterios de evaluación...")
+    st.write("Configura el tamaño de tu tabla dadas la cantidad de opciones y criterios de evaluación que desees...")
     col1, col2 = st.columns(2)
     with col1:
         num_alternativas = st.number_input("Número de Opciones (Filas)", min_value=2, max_value=8, value=4)
@@ -50,10 +50,10 @@ if "manualmente" in metodo_entrada:
 
 # --- OPCIÓN 2: SUBIR ARCHIVO ---
 else:
-    st.subheader("Sube tu archivo. No olvides poner nombres")
+    st.subheader("Sube tu archivo. No olvides poner nombres a tus Opciones y Criterios de evaluación")
     # Nota: Aquí puedes completar el correo electrónico o dato de contacto al final del texto
-    st.info("Si deseas que se agreguen automáticamente los Pesos o Valores de importancia de tus Criterios de evaluación, debes agregar una segunda hoja a tu archivo Excel, en ella debes colocar de arriba a abajo (es decir, únicamente en la columna A) el peso de tus criterios. El primer peso que agregues será considerado el peso del criterio de evaluación 1, el segundo peso que agregues será considerado el peso del criterio de evaluación 2 y así sucesivamente. Cualquier duda contactar a: [TU CORREO AQUÍ]")
-    st.info("Si deseas agregar tus Pesos manualmente sube tu archivo Excel con únicamente una Hoja que incluya tu tabla de decisión. En el menú lateral podrás agregar tus Pesos o Valores de importancia por criterio.")
+    st.info("Si deseas que se agreguen automáticamente los Pesos o Valores de importancia de tus Criterios de evaluación, debes agregar una segunda hoja a tu archivo Excel y en ella debes colocar el peso de tus criterios. NOTA: debes colocar de arriba a abajo (es decir, únicamente en la columna A) el peso de tus criterios,  el primer peso que agregues será considerado el peso del criterio de evaluación 1, el segundo peso que agregues será considerado el peso del criterio de evaluación 2 y así sucesivamente. Cualquier duda contactar a: [Algún correo]")
+    st.info("Si deseas agregar tus Pesos manualmente sube tu archivo Excel con únicamente una Hoja que incluya tu tabla de decisión. Una vez cargado tu archivo, en el menú lateral podrás agregar manualmente tus Pesos o Valores de importancia por criterio.")
     uploaded_file = st.file_uploader("Selecciona un archivo .xlsx", type=["xlsx"])
 
     if uploaded_file:
@@ -75,7 +75,7 @@ else:
                 
                 if len(pesos_brutos) > 0:
                     pesos_auto = pesos_brutos
-                    st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define en cada criterio si deseas maximizar o minimizar.")
+                    st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define para cada criterio si deseas maximizar o minimizar.")
                 else:
                     st.warning("Se detectó una segunda hoja, pero está vacía o no tiene números. **Por favor cree la lista de pesos en orden sobre la columna A para que se carguen automáticamente.**")
             except Exception as e:
@@ -115,7 +115,7 @@ if df_editado is not None:
     if round(suma_actual, 2) == 1.00:
         espacio_nota.success(f"Perfecto, has llegado a: {suma_actual:.2f} / 1.00")
     elif suma_actual > 1.00:
-        espacio_nota.error(f"Has rebasado 1: {suma_actual:.2f} / 1.00")
+        espacio_nota.error(f"Has rebasado 1, llevas: {suma_actual:.2f} / 1.00")
     else:
         espacio_nota.warning(f"Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f})")
     
