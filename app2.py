@@ -14,7 +14,7 @@ import numpy as np
 
 st.set_page_config(page_title="Método TOPSIS", layout="wide")
 st.title("Método TOPSIS")
-st.text("El método TOPSIS una técnica creada en 1981 por Hwang y Yoon. Este método consiste en evaluar las alternativas dada su similitud y cercanía a la mejor solución encontrada en tus datos, y con ello dar una lista de preferencia base tus opciones ordenadas de mayor a menor (llamada ranking). Para este proceso, es necesario que nos proporciones tus Opciones / Alternativas entre las que estás decidiendo y tus Propiedades sobre las cuales evaluaremos tus alternativas (estas propiedades serán llamadas Criterios de evaluación).")
+st.text("El método TOPSIS una técnica creada en 1981 por Hwang y Yoon. Este método consiste en evaluar las alternativas dada su similitud y cercanía a la mejor solución encontrada en tus datos, y con ello dar una lista de preferencia base tus opciones ordenadas de mayor a menor (llamada ranking). Para este proceso, es necesario que nos proporciones tus Opciones / Alternativas entre las que estás decidiendo, tus Propiedades sobre las cuales evaluaremos tus alternativas (estas propiedades serán llamadas Criterios de evaluación) y tus Pesos o Valor de importancia sobre cada Criterio de evaluación.")
 
 # --- SELECTOR DE MÉTODO DE ENTRADA ---
 metodo_entrada = st.radio(
@@ -90,7 +90,7 @@ if df_editado is not None:
     impactos = []
     columnas_criterios = df_editado.columns[1:]
     
-    st.sidebar.header("Pesos o Valor de importancia sobre cada Criterio de evaluación")
+    st.sidebar.header("Pesos o Valor de importancia.")
     st.info("La suma de todos tus pesos debe ser exactamente 1")
     espacio_nota = st.sidebar.empty() 
     st.sidebar.divider()
