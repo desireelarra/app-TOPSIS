@@ -95,7 +95,7 @@ else:
                         
                         # Validamos si suman 1 (con un margen mínimo de error por decimales)
                         if suma_pesos < 0.999 or suma_pesos > 1.01:
-                            st.warning(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}', pero **suman {suma_pesos:.2f} en lugar de 1.00**. Por favor, edita los pesos en tu archivo Excel para que sumen exactamente 1 y vuelve a subirlo.")
+                            st.warning(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}', pero **suman {suma_pesos:.2f} en lugar de 1.00**. Por favor, edita los pesos en tu archivo Excel para que sumen exactamente 1 y vuelve a subirlo, o ajuste manualmente los pesos en la barra lateral.")
                         else:
                             # Todo es correcto: coinciden en cantidad y suman 1
                             pesos_auto = pesos_brutos
