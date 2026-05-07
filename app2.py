@@ -87,7 +87,7 @@ else:
                         
                     elif len(pesos_brutos) != num_criterios_reales:
                         # La cantidad de pesos no coincide con la cantidad de criterios
-                        st.warning(f"Se detectaron {len(pesos_brutos)} pesos, pero tu tabla tiene {num_criterios_reales} criterios. **Por favor, asegúrate de colocar exactamente un peso por cada criterio en tu archivo y vuelve a subirlo**")
+                        st.warning(f"Se detectaron {len(pesos_brutos)} pesos, pero tu tabla tiene {num_criterios_reales} criterios. **Por favor, asegúrate de colocar exactamente un peso por cada criterio en tu archivo y vuelve a subirlo** o ajuste manualmente los pesos en la barra lateral.")
                         
                     else:
                         # Sumamos los pesos detectados
