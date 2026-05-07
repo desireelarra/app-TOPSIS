@@ -50,7 +50,7 @@ if "manualmente" in metodo_entrada:
 
 # --- OPCIÓN 2: SUBIR ARCHIVO ---
 else:
-    st.subheader("Sube tu archivo. No olvides poner nombres a tus Opciones y Criterios de evaluación 🤓.")
+    st.subheader("Sube tu archivo. No olvides poner nombres a tus Opciones y Criterios de evaluación 🧐.")
     # Nota: Aquí puedes completar el correo electrónico o dato de contacto al final del texto
     st.info("Si deseas que se agreguen automáticamente los Pesos o Valores de importancia de tus Criterios de evaluación, debes agregar una segunda hoja a tu archivo Excel y en ella debes colocar el peso de tus criterios. NOTA: debes colocar de arriba a abajo (es decir, únicamente en la columna A) el peso de tus criterios,  el primer peso que agregues será considerado el peso del criterio de evaluación 1, el segundo peso que agregues será considerado el peso del criterio de evaluación 2 y así sucesivamente. Cualquier duda contactar a: [Algún correo]")
     st.info("Si deseas agregar tus Pesos manualmente sube tu archivo Excel con únicamente una Hoja que incluya tu tabla de decisión. Una vez cargado tu archivo, en el menú lateral podrás agregar manualmente tus Pesos o Valores de importancia por criterio.")
