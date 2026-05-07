@@ -63,7 +63,8 @@ else:
         df_subido = pd.read_excel(uploaded_file, sheet_name=0)
         st.info(f"Tabla con datos de decisión cargada desde la hoja: '{excel_obj.sheet_names[0]}'")
         df_editado = st.data_editor(df_subido, hide_index=True, use_container_width=True)
-        
+
+
         # PESOS (Segunda hoja - Validación Avanzada)
         if len(excel_obj.sheet_names) > 1:
             try:
@@ -77,19 +78,35 @@ else:
                     # Forzamos a que sean números y eliminamos celdas vacías o con texto
                     pesos_brutos = pd.to_numeric(df_conf.iloc[:, 0], errors='coerce').dropna().tolist()
                     
-                    if len(pesos_brutos) > 0:
-                        pesos_auto = pesos_brutos
-                        st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define para cada criterio si deseas maximizar o minimizar.")
+                    # Contamos cuántos criterios hay en la matriz (restamos 1 por la columna de nombres)
+                    num_criterios_reales = len(df_editado.columns) - 1
+                    
+                    if len(pesos_brutos) == 0:
+                        # No hay números, puras letras o vacío
+                        st.warning("Se detectó una segunda hoja, pero no tiene números válidos. **Por favor asegúrese de poner los pesos como números en la columna A** o ajuste manualmente los pesos en la barra lateral.")
+                        
+                    elif len(pesos_brutos) != num_criterios_reales:
+                        # La cantidad de pesos no coincide con la cantidad de criterios
+                        st.warning(f"Se detectaron {len(pesos_brutos)} pesos, pero tu tabla tiene {num_criterios_reales} criterios. **Por favor, asegúrate de colocar exactamente un peso por cada criterio en tu archivo y vuelve a subirlo**")
+                        
                     else:
-                        # Esto se muestra si hay una hoja, hay datos, pero son puras letras y no números
-                        st.warning("Se detectó una segunda hoja, pero no tiene números válidos. **Por favor asegúrese de poner los pesos como números en la columna A.**")
+                        # Sumamos los pesos detectados
+                        suma_pesos = sum(pesos_brutos)
+                        
+                        # Validamos si suman 1 (con un margen mínimo de error por decimales)
+                        if suma_pesos < 0.999 or suma_pesos > 1.01:
+                            st.warning(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}', pero **suman {suma_pesos:.2f} en lugar de 1.00**. Por favor, edita los pesos en tu archivo Excel para que sumen exactamente 1 y vuelve a subirlo.")
+                        else:
+                            # Todo es correcto: coinciden en cantidad y suman 1
+                            pesos_auto = pesos_brutos
+                            st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define para cada criterio si deseas maximizar o minimizar.")
             
             except Exception as e:
                 st.error("Hubo un error al leer la segunda hoja. Asegúrese de que el formato sea correcto.")
         
         # EL ELSE QUE FALTABA: Si el usuario sube un archivo con solo 1 hoja
         else:
-            st.info("Al parecer no agregaste los pesos en tu archivo excel. Por favor ajusta manualmente en la barra lateral izquierda tus pesos y especifica si quieres maximizar o minimizar cada criterio. ")
+            st.info("Al parecer no agregaste los pesos en tu archivo excel, por favor ajusta manualmente en la barra lateral izquierda tus pesos y especifica si quieres maximizar o minimizar cada criterio.")
 
 # --- CONFIGURACIÓN DE CRITERIOS (BARRA LATERAL HÍBRIDA) ---
 
@@ -132,7 +149,7 @@ if df_editado is not None:
     # --- LÓGICA MATEMÁTICA TOPSIS ---
     if st.button("Obtener el ranking de la mejor opción", type="primary"):
         if sum(pesos) < 0.98 or sum(pesos) > 1.02:
-             st.error(f"La suma de los pesos es {sum(pesos):.2f}. Debe ser 1.0 para calcular.")
+             st.error(f"La suma de los pesos es {sum(pesos):.2f}. Debe ser exactamente 1.0 para calcular. Por favor edita nuevamente los pesos.")
              st.stop()
 
         alternativas = df_editado.iloc[:, 0].tolist()
