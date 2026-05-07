@@ -19,7 +19,7 @@ st.text("El método TOPSIS una técnica creada en 1981 por Hwang y Yoon. Este m�
 # --- SELECTOR DE MÉTODO DE ENTRADA ---
 metodo_entrada = st.radio(
     "¿Cómo prefieres ingresar los datos de tu tabla?",
-    ["Agregar manualmente los datos de mi tabla (máximo 8 filas o columnas)", "Subir archivo Excel (.xlsx) de mi tabla"],
+    ["Agregar manualmente los datos de mi tabla", "Subir archivo Excel (.xlsx) de mi tabla"],
     horizontal=True
 )
 
@@ -30,12 +30,12 @@ impactos_auto = None
 
 # --- OPCIÓN 1: ENTRADA MANUAL ---
 if "manualmente" in metodo_entrada: 
-    st.write("Configura el tamaño de tu tabla dadas la cantidad de opciones y criterios de evaluación que desees...")
+    st.write("Configura el tamaño de tu tabla dadas la cantidad de opciones y criterios de evaluación que desees. No es necesario que tu tabla tenga la misma cantidad de opciones y criterios.")
     col1, col2 = st.columns(2)
     with col1:
-        num_alternativas = st.number_input("Número de Opciones (Filas)", min_value=2, max_value=8, value=4)
+        num_alternativas = st.number_input("Número de Opciones (Filas)", min_value=2, max_value=100, value=4)
     with col2:
-        num_criterios = st.number_input("Número de Criterios de evaluación (Columnas)", min_value=2, max_value=8, value=5)
+        num_criterios = st.number_input("Número de Criterios de evaluación (Columnas)", min_value=2, max_value=100, value=5)
 
     alternativas_nombres = [f"Opción {i+1}" for i in range(num_alternativas)]
     criterios_nombres = [f"Criterio {chr(65+i)}" for i in range(num_criterios)]
@@ -70,21 +70,29 @@ else:
                 # header=None evita que se pierda el primer peso si no le ponen título
                 df_conf = pd.read_excel(uploaded_file, sheet_name=1, header=None)
                 
-                # Forzamos a que sean números y eliminamos celdas vacías o con texto
-                pesos_brutos = pd.to_numeric(df_conf.iloc[:, 0], errors='coerce').dropna().tolist()
-                
-                if len(pesos_brutos) > 0:
-                    pesos_auto = pesos_brutos
-                    st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define para cada criterio si deseas maximizar o minimizar.")
+                # VALIDACIÓN NUEVA: Revisamos si la hoja está totalmente vacía antes de leer columnas
+                if df_conf.empty or len(df_conf.columns) == 0:
+                    st.warning("Se detectó una segunda hoja, pero está vacía. **Por favor cree la lista de pesos en orden sobre la columna A para que se carguen automáticamente.**")
                 else:
-                    st.warning("Se detectó una segunda hoja, pero está vacía o no tiene números. **Por favor cree la lista de pesos en orden sobre la columna A para que se carguen automáticamente.**")
+                    # Forzamos a que sean números y eliminamos celdas vacías o con texto
+                    pesos_brutos = pd.to_numeric(df_conf.iloc[:, 0], errors='coerce').dropna().tolist()
+                    
+                    if len(pesos_brutos) > 0:
+                        pesos_auto = pesos_brutos
+                        st.success(f"Hemos obtenido tus pesos de la hoja: '{excel_obj.sheet_names[1]}'. Por favor, en el menú lateral define para cada criterio si deseas maximizar o minimizar.")
+                    else:
+                        # Esto se muestra si hay una hoja, hay datos, pero son puras letras y no números
+                        st.warning("Se detectó una segunda hoja, pero no tiene números válidos. **Por favor asegúrese de poner los pesos como números en la columna A.**")
+            
             except Exception as e:
-                st.warning("No se detectó una segunda hoja o hubo un error al leerla. **Por favor cree la segunda Hoja y haga una lista de pesos en orden sobre la columna A para que se carguen automáticamente. De lo contrario, agregue manualmente el peso de cada criterio.**")
-    else: 
-        st.warning("Esperando archivo... sube un archivo Excel para continuar.")
-        st.stop()
+                st.error("Hubo un error al leer la segunda hoja. Asegúrese de que el formato sea correcto.")
+        
+        # EL ELSE QUE FALTABA: Si el usuario sube un archivo con solo 1 hoja
+        else:
+            st.info("Al parecer no agregaste los pesos en tu archivo excel, por favor ajusta manualmente en la barra lateral izquierda tus pesos y especifica si quieres maximizar o minimizar cada criterio")
 
 # --- CONFIGURACIÓN DE CRITERIOS (BARRA LATERAL HÍBRIDA) ---
+
 if df_editado is not None:
     pesos = []
     impactos = []
