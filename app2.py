@@ -89,7 +89,7 @@ else:
         
         # EL ELSE QUE FALTABA: Si el usuario sube un archivo con solo 1 hoja
         else:
-            st.info("Al parecer no agregaste los pesos en tu archivo excel, por favor ajusta manualmente en la barra lateral izquierda tus pesos y especifica si quieres maximizar o minimizar cada criterio")
+            st.info("Al parecer no agregaste los pesos en tu archivo excel. Por favor ajusta manualmente en la barra lateral izquierda tus pesos y especifica si quieres maximizar o minimizar cada criterio. ")
 
 # --- CONFIGURACIÓN DE CRITERIOS (BARRA LATERAL HÍBRIDA) ---
 
